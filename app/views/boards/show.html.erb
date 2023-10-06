@@ -3,6 +3,9 @@
     <h1>
       <%= @the_board.name %>
     </h1>
+    <p>Owner: 
+    <% users_board = User.where(:id => @the_board.user_id)[0]%>
+      <%= the_user = users_board.email%></p>
   </div>
 </div>
 
@@ -11,7 +14,7 @@
 <h2>
   Add a new post
 </h2>
-
+<% if current_user != nil %>
 <form action="/insert_post" method="post">
   <div>
     <label for="title_box">
@@ -43,6 +46,9 @@
     Add post
   </button>
 </form>
+<% else %>
+    <p>You must be <a href="/users/sign_in">Sign in</a> signed in to add a board</p>
+<% end %>
 
 <hr>
 
@@ -52,14 +58,24 @@
   <tr>
     <th>Title</th>
     <th>Body</th>
+    <th>Posted by</th>
     <th>Posted on</th>
     <th>Expires on</th>
   </tr>
 
   <% @active_posts.each do |a_post| %>
     <tr>
-      <td><%= a_post.title %></td>
+      <td>
+<% if current_user != nil %>
+      <%= a_post.title %>
+      <a href="/delete_post/<%= a_post.id %>">Delete post </a>
+<% else %>
+      <%= a_post.title %>
+<% end %>
+      </td>
       <td><%= a_post.body %></td>
+      <% users_posts = User.where(:id => a_post.user_id)[0]%>
+      <td><%= the_user = users_posts.email%></td>
       <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
       <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
     </tr>
@@ -78,7 +94,8 @@
 
   <% @expired_posts.each do |a_post| %>
     <tr>
-      <td><%= a_post.title %></td>
+      <td><%= a_post.title %>
+       <a href="/delete_post/<%= a_post.id %>">Delete post </a></td>
       <td><%= a_post.body %></td>
       <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
       <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
